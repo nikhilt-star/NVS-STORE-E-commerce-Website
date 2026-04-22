@@ -1,5 +1,4 @@
 import express from 'express';
-import morgan from 'morgan';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.route.js'
@@ -23,7 +22,6 @@ app.use(cors({
 }))
 
 app.use(express.json())
-app.use(morgan('dev'));
 app.use(cookieParser())
 
 
@@ -33,5 +31,3 @@ app.use('/api/shop/products', shopProductsRouter)
 app.use('/api/shop/cart', shopCartRouter)
 
 export default app;
-
-// 7:23
