@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@config "../tailwind.config.js";
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color: #1f1725;
+    background: #ffffff;
+    font-family: 'Manrope', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    background: #ffffff;
+    color: #201722;
+    font-family: 'Manrope', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@layer components {
+  .section-shell {
+    @apply mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-10;
+  }
+
+  .section-title {
+    @apply font-display text-[2.4rem] leading-[0.95] tracking-[-0.03em] text-nvs-brown md:text-[3.6rem];
+  }
+
+  .eyebrow {
+    @apply text-[0.72rem] font-semibold uppercase tracking-[0.32em] text-nvs-brown/70;
+  }
+
+  .product-rail {
+    scrollbar-width: none;
+  }
+
+  .product-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nvs-marquee {
+    animation: nvs-marquee 24s linear infinite;
+  }
+}
+
+@keyframes nvs-marquee {
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
