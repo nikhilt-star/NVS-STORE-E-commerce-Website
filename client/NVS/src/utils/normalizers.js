@@ -24,6 +24,7 @@ export const normalizeUser = (user) => {
     email: user.email,
     phone: user.phone || '',
     role: user.role || 'user',
+    isActive: user.isActive ?? true,
     defaultAddress,
     address: user.address || formatAddress(defaultAddress),
   }

@@ -9,7 +9,6 @@ const userIdValidation = [
 
 const updateUserValidation = [
   param('id').isMongoId().withMessage('Invalid user id.'),
-  body('role').optional().isIn(['user', 'admin']).withMessage('Role must be user or admin.'),
   body('isActive').optional().isBoolean().withMessage('isActive must be a boolean.'),
   validateRequest,
 ];

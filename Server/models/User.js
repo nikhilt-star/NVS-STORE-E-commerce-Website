@@ -118,6 +118,9 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// Enforce the single-admin rule at the database level as well.
+userSchema.index({ role: 1 }, { unique: true, partialFilterExpression: { role: 'admin' } });
+
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
 

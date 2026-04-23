@@ -20,10 +20,12 @@ router.get('/dashboard', adminController.getDashboardStats);
 router.get('/users', adminController.getUsers);
 router.get('/users/:id', userIdValidation, adminController.getUserById);
 router.put('/users/:id', updateUserValidation, adminController.updateUser);
+router.patch('/users/:id', updateUserValidation, adminController.updateUser);
 router.delete('/users/:id', userIdValidation, adminController.deleteUser);
 router.get('/products', productController.getAdminProducts);
 router.get('/orders', orderController.getAllOrders);
 router.get('/orders/:id', orderIdValidation, orderController.getOrderById);
 router.put('/orders/:id/status', updateOrderStatusValidation, orderController.updateOrderStatus);
+router.patch('/orders/:id', updateOrderStatusValidation, orderController.updateOrderStatus);
 
 module.exports = router;

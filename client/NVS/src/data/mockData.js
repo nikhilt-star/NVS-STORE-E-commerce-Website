@@ -1,9 +1,9 @@
 import bottleImage from '../assets/design/product-bottle.jpg'
 import mobileImage from '../assets/design/product-mobile.jpg'
-import brushImage from '../assets/design/product-brush.jpg'
+import brushImage from '../assets/design/product-brush.png'
 import bubbleImage from '../assets/design/product-bubble.jpg'
-import freshBlueImage from '../assets/design/fresh-card-blue.jpg'
-import freshBottleImage from '../assets/design/fresh-card-bottle.jpg'
+import freshBlueImage from '../assets/design/Silicone-Rattle-Teether.png'
+import freshBottleImage from '../assets/design/fruit-shipper-bottle.png'
 import shopAllKidsImage from '../assets/design/shop-all-kids.jpg'
 import brandLogo from '../assets/design/logo.png'
 
@@ -96,8 +96,8 @@ export const products = [
   },
   {
     id: 'pony-play-set',
-    name: 'Pony Play Set',
-    price: 25,
+    name: 'Silicone Rattle Teether',
+    price: 250,
     originalPrice: 45,
     category: 'Toys',
     featuredGroup: 'arrivals',

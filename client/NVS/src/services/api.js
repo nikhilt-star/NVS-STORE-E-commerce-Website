@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { mockAdapter } from './mockBackend'
+import { clearStoredToken, getStoredToken } from './authStorage'
 
 const useMockApi = import.meta.env.VITE_USE_MOCK_API === 'true'
 const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
@@ -13,9 +14,23 @@ const api = axios.create({
   ...(useMockApi ? { adapter: mockAdapter } : {}),
 })
 
+api.interceptors.request.use((config) => {
+  const token = getStoredToken()
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+
+  return config
+})
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      clearStoredToken()
+    }
+
     if (!error.response && error.request) {
       error.userMessage =
         'Unable to reach the server. Check that both frontend and backend are running.'

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "check": "node -e \"require('./app'); console.log('app-ok')\""
+    "check": "node -e \"require('./app'); console.log('app-ok')\"",
+    "create:admin": "node scripts/createAdmin.js"
   },
   "keywords": [
     "nodejs",

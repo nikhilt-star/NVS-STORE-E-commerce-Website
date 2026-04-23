@@ -118,7 +118,6 @@ const updateUser = catchAsync(async (req, res) => {
   const user = await User.findByIdAndUpdate(
     req.params.id,
     {
-      role: req.body.role,
       isActive: req.body.isActive,
     },
     {
