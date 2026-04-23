@@ -56,44 +56,86 @@ export const mockAdapter = async (config) => {
   if (method === 'post' && url === '/auth/login') {
     const user = body.email?.includes('admin') ? mockUsers.admin : mockUsers.customer
     return makeResponse(config, {
-      token: `${user.role}-demo-token`,
       user,
     })
   }
 
   if (method === 'post' && url === '/auth/register') {
     return makeResponse(config, {
-      token: 'customer-demo-token',
       user: {
         ...mockUsers.customer,
         name: body.name || mockUsers.customer.name,
         email: body.email || mockUsers.customer.email,
+        phone: body.phone || mockUsers.customer.phone,
       },
     })
   }
 
-  if (method === 'get' && url === '/auth/profile') {
-    const isAdmin = config.headers?.Authorization?.includes('admin')
-    return makeResponse(config, isAdmin ? mockUsers.admin : mockUsers.customer)
+  if (method === 'post' && url === '/auth/logout') {
+    return makeResponse(config, {
+      success: true,
+      message: 'Logout successful.',
+    })
   }
 
-  if (method === 'get' && url === '/orders') {
-    return makeResponse(config, mockOrders)
+  if (method === 'get' && url === '/auth/me') {
+    return makeResponse(config, {
+      user: mockUsers.customer,
+    })
+  }
+
+  if (method === 'get' && url === '/orders/mine') {
+    return makeResponse(config, {
+      orders: mockOrders,
+    })
   }
 
   if (method === 'post' && url === '/orders') {
-    const items = body.items || []
+    const items = body.orderItems || []
     const total = items.reduce((sum, item) => {
-      const product = products.find((entry) => entry.id === item.productId)
+      const product = products.find((entry) => entry.id === item.product || entry.id === item.productId)
       return sum + (product?.price || 0) * item.quantity
     }, 0)
 
     return makeResponse(config, {
-      id: `order-${Date.now()}`,
-      status: 'Confirmed',
-      total,
-      items,
-      date: new Date().toISOString().slice(0, 10),
+      order: {
+        _id: `order-${Date.now()}`,
+        orderNumber: `NVS-${Date.now()}`,
+        orderStatus: 'Pending',
+        totalPrice: total,
+        orderItems: items,
+        createdAt: new Date().toISOString(),
+      },
+    })
+  }
+
+  if (method === 'get' && url === '/payments/config') {
+    return makeResponse(config, {
+      key: 'rzp_test_mock',
+      currency: 'INR',
+    })
+  }
+
+  if (method === 'post' && url.startsWith('/payments/create-intent/')) {
+    return makeResponse(config, {
+      paymentOrder: {
+        id: `pay_${Date.now()}`,
+        amount: 1000,
+        currency: 'INR',
+      },
+      orderId: url.split('/').pop(),
+    })
+  }
+
+  if (method === 'post' && url === '/payments/verify') {
+    return makeResponse(config, {
+      order: {
+        _id: body.orderId,
+        orderNumber: `NVS-${Date.now()}`,
+        orderStatus: 'Paid',
+        totalPrice: 10,
+        createdAt: new Date().toISOString(),
+      },
     })
   }
 

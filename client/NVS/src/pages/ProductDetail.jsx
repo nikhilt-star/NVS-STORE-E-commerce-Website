@@ -10,8 +10,8 @@ import ProductCard from '../components/ui/ProductCard'
 import StarRating from '../components/ui/StarRating'
 import { addItem } from '../features/cart/cartSlice'
 import { toggleWishlist } from '../features/wishlist/wishlistSlice'
-import { products } from '../data/mockData'
 import { productService } from '../services/productService'
+import { getApiErrorMessage } from '../utils/apiError'
 import { formatCurrency } from '../utils/formatCurrency'
 
 function ProductDetail() {
@@ -19,18 +19,43 @@ function ProductDetail() {
   const dispatch = useDispatch()
   const wishlist = useSelector((state) => state.wishlist.items)
   const [product, setProduct] = useState(null)
+  const [relatedProducts, setRelatedProducts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     let isMounted = true
 
     const loadProduct = async () => {
-      setIsLoading(true)
-      const result = await productService.getProductById(productId)
+      try {
+        setIsLoading(true)
+        setErrorMessage('')
+        const result = await productService.getProductById(productId)
 
-      if (isMounted) {
+        if (!isMounted) {
+          return
+        }
+
         setProduct(result)
-        setIsLoading(false)
+
+        const related = await productService.getProducts({
+          category: result.category,
+          limit: 4,
+          sort: '-createdAt',
+        })
+
+        if (isMounted) {
+          setRelatedProducts(related.filter((item) => item.id !== result.id).slice(0, 3))
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(getApiErrorMessage(error))
+          setProduct(null)
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
 
@@ -53,13 +78,13 @@ function ProductDetail() {
     return (
       <PageTransition className="section-shell py-16">
         <div className="rounded-[32px] border border-nvs-line bg-white p-10 text-center">
-          <h1 className="font-display text-5xl text-nvs-brown">Product not found</h1>
+          <h1 className="font-display text-5xl text-nvs-brown">
+            {errorMessage || 'Product not found'}
+          </h1>
         </div>
       </PageTransition>
     )
   }
-
-  const relatedProducts = products.filter((item) => item.id !== product.id).slice(0, 3)
 
   return (
     <PageTransition className="bg-nvs-cream/35">
@@ -85,9 +110,11 @@ function ProductDetail() {
               <span className="text-2xl font-extrabold text-nvs-brown">
                 {formatCurrency(product.price)}
               </span>
-              <span className="text-lg font-semibold text-slate-400 line-through">
-                {formatCurrency(product.originalPrice)}
-              </span>
+              {product.originalPrice > product.price ? (
+                <span className="text-lg font-semibold text-slate-400 line-through">
+                  {formatCurrency(product.originalPrice)}
+                </span>
+              ) : null}
             </div>
             <p className="mt-6 text-base font-medium leading-8 text-nvs-brown/70">
               {product.description}

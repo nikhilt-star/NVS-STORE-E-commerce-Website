@@ -1,34 +1,30 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const getStoredUser = () => {
-  const rawValue = window.localStorage.getItem('nvs-user')
-  return rawValue ? JSON.parse(rawValue) : null
-}
-
 const initialState = {
-  user: getStoredUser(),
-  token: window.localStorage.getItem('nvs-token'),
-  status: 'idle',
+  user: null,
+  status: 'loading',
+  hasInitialized: false,
 }
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setCredentials(state, action) {
-      state.user = action.payload.user
-      state.token = action.payload.token
-      window.localStorage.setItem('nvs-user', JSON.stringify(action.payload.user))
-      window.localStorage.setItem('nvs-token', action.payload.token)
+    setAuthLoading(state) {
+      state.status = 'loading'
     },
-    logout(state) {
+    setAuthenticated(state, action) {
+      state.user = action.payload
+      state.status = 'authenticated'
+      state.hasInitialized = true
+    },
+    clearAuth(state) {
       state.user = null
-      state.token = null
-      window.localStorage.removeItem('nvs-user')
-      window.localStorage.removeItem('nvs-token')
+      state.status = 'unauthenticated'
+      state.hasInitialized = true
     },
   },
 })
 
-export const { setCredentials, logout } = authSlice.actions
+export const { setAuthLoading, setAuthenticated, clearAuth } = authSlice.actions
 export default authSlice.reducer

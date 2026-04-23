@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { brandAssets, navLinks, promoMessage } from '../../data/mockData'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCart'
@@ -8,8 +8,20 @@ import Button from '../common/Button'
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const navigate = useNavigate()
   const { totalItems } = useCart()
   const { user, logout } = useAuth()
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true)
+      await logout()
+      navigate('/login', { replace: true })
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <header className="border-b border-nvs-line/70 bg-white">
@@ -64,8 +76,8 @@ function Navbar() {
             <Heart size={20} />
           </Link>
           {user ? (
-            <Button variant="ghost" className="px-0 py-0 text-sm" onClick={logout}>
-              Logout
+            <Button variant="ghost" className="px-0 py-0 text-sm" onClick={handleLogout}>
+              {isLoggingOut ? 'Logging out...' : 'Logout'}
             </Button>
           ) : null}
           <Button as={Link} to="/checkout" variant="accent" className="min-w-[138px]">

@@ -6,11 +6,16 @@ import Loader from '../components/common/Loader'
 import ProductCard from '../components/ui/ProductCard'
 import { collectionTabs, mostLovedCategories } from '../data/mockData'
 import { productService } from '../services/productService'
+import { getApiErrorMessage } from '../utils/apiError'
 
 function ProductList() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [products, setProducts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [categories, setCategories] = useState(
+    mostLovedCategories.map((item) => item.label),
+  )
   const [selectedCategory, setSelectedCategory] = useState('All')
   const activeTab = searchParams.get('tab') || 'bestsellers'
 
@@ -18,12 +23,26 @@ function ProductList() {
     let isMounted = true
 
     const loadProducts = async () => {
-      setIsLoading(true)
-      const result = await productService.getProducts({ tab: activeTab })
+      try {
+        setIsLoading(true)
+        setErrorMessage('')
+        const [productResults, categoryResults] = await Promise.all([
+          productService.getProducts({ tab: activeTab }),
+          productService.getCategories(),
+        ])
 
-      if (isMounted) {
-        setProducts(result)
-        setIsLoading(false)
+        if (isMounted) {
+          setProducts(productResults)
+          setCategories(categoryResults.length ? categoryResults : mostLovedCategories.map((item) => item.label))
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(getApiErrorMessage(error))
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
 
@@ -70,7 +89,7 @@ function ProductList() {
         </div>
 
         <div className="mt-5 flex flex-wrap gap-3">
-          {['All', ...mostLovedCategories.map((item) => item.label)].map((category) => (
+          {['All', ...categories].map((category) => (
             <button
               key={category}
               type="button"
@@ -88,6 +107,14 @@ function ProductList() {
 
         {isLoading ? (
           <Loader />
+        ) : errorMessage ? (
+          <div className="mt-10 rounded-[28px] bg-red-50 px-6 py-5 text-sm font-medium text-red-600">
+            {errorMessage}
+          </div>
+        ) : !filteredProducts.length ? (
+          <div className="mt-10 rounded-[28px] border border-dashed border-nvs-line bg-white px-6 py-10 text-center text-sm font-medium text-nvs-brown/70">
+            No products matched this filter.
+          </div>
         ) : (
           <div className="mt-10 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
             {filteredProducts.map((product) => (

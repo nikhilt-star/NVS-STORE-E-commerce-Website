@@ -6,13 +6,16 @@ import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import { useAuth } from '../hooks/useAuth'
 import { authService } from '../services/authService'
+import { getApiErrorMessage } from '../utils/apiError'
 import { validators } from '../utils/validators'
 
 function Register() {
   const navigate = useNavigate()
   const { login } = useAuth()
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' })
   const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -20,7 +23,8 @@ function Register() {
     const nextErrors = {
       name: validators.required(form.name) ? '' : 'Name is required',
       email: validators.email(form.email) ? '' : 'Enter a valid email',
-      password: validators.minLength(form.password, 6) ? '' : 'Minimum 6 characters',
+      phone: form.phone && !validators.minLength(form.phone, 10) ? 'Enter a valid phone number' : '',
+      password: validators.minLength(form.password, 8) ? '' : 'Minimum 8 characters',
     }
 
     setErrors(nextErrors)
@@ -29,9 +33,17 @@ function Register() {
       return
     }
 
-    const payload = await authService.register(form)
-    login(payload)
-    navigate('/profile', { replace: true })
+    try {
+      setIsSubmitting(true)
+      setSubmitError('')
+      const payload = await authService.register(form)
+      login(payload)
+      navigate('/profile', { replace: true })
+    } catch (error) {
+      setSubmitError(getApiErrorMessage(error))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -59,6 +71,15 @@ function Register() {
               placeholder="parent@nvskids.com"
             />
             <Input
+              label="Phone"
+              value={form.phone}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, phone: event.target.value }))
+              }
+              error={errors.phone}
+              placeholder="+91 98765 43210"
+            />
+            <Input
               label="Password"
               type="password"
               value={form.password}
@@ -66,10 +87,15 @@ function Register() {
                 setForm((current) => ({ ...current, password: event.target.value }))
               }
               error={errors.password}
-              placeholder="******"
+              placeholder="********"
             />
+            {submitError ? (
+              <p className="rounded-[20px] bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                {submitError}
+              </p>
+            ) : null}
             <Button type="submit" className="mt-2">
-              Create Account
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
 

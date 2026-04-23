@@ -4,22 +4,34 @@ import SectionReveal from '../components/common/SectionReveal'
 import Loader from '../components/common/Loader'
 import { useAuth } from '../hooks/useAuth'
 import { orderService } from '../services/orderService'
+import { getApiErrorMessage } from '../utils/apiError'
 import { formatCurrency } from '../utils/formatCurrency'
 
 function Profile() {
   const { user } = useAuth()
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     let isMounted = true
 
     const loadOrders = async () => {
-      const result = await orderService.getOrders()
+      try {
+        setErrorMessage('')
+        const result = await orderService.getOrders()
 
-      if (isMounted) {
-        setOrders(result)
-        setIsLoading(false)
+        if (isMounted) {
+          setOrders(result)
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(getApiErrorMessage(error))
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
       }
     }
 
@@ -40,7 +52,7 @@ function Profile() {
             <div className="mt-8 space-y-4 text-sm font-semibold text-nvs-brown/75">
               <p>Email: {user?.email}</p>
               <p>Phone: {user?.phone}</p>
-              <p>Address: {user?.address}</p>
+              <p>Address: {user?.address || 'No default address saved yet.'}</p>
               <p>Role: {user?.role}</p>
             </div>
           </div>
@@ -53,6 +65,14 @@ function Profile() {
 
             {isLoading ? (
               <Loader label="Loading order history..." />
+            ) : errorMessage ? (
+              <div className="mt-8 rounded-[24px] bg-red-50 px-5 py-4 text-sm font-medium text-red-600">
+                {errorMessage}
+              </div>
+            ) : !orders.length ? (
+              <div className="mt-8 rounded-[24px] bg-nvs-cream px-5 py-5 text-sm font-medium text-nvs-brown/70">
+                No orders yet. Your upcoming purchases will appear here.
+              </div>
             ) : (
               <div className="mt-8 grid gap-4">
                 {orders.map((order) => (

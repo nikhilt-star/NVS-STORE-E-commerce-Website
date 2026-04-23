@@ -28,6 +28,7 @@ function OrderSuccess() {
               </p>
               <p className="mt-3 font-display text-4xl text-nvs-brown">{formatCurrency(order.total)}</p>
               <p className="mt-3 text-sm font-semibold text-nvs-brown/70">{order.status}</p>
+              <p className="mt-3 text-sm font-medium text-nvs-brown/60">{order.date}</p>
             </div>
           ) : null}
 

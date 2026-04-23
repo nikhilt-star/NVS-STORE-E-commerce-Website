@@ -1,5 +1,5 @@
 import { Heart, ShoppingBag } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion as Motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleWishlist } from '../../features/wishlist/wishlistSlice'
@@ -12,7 +12,7 @@ function ProductCard({ product }) {
   const isWishlisted = wishlist.includes(product.id)
 
   return (
-    <motion.article
+    <Motion.article
       whileHover={{ y: -6, scale: 1.01 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="group h-full w-full"
@@ -64,14 +64,16 @@ function ProductCard({ product }) {
             </h3>
             <div className="mt-1.5 flex items-center gap-2 text-[0.92rem] font-semibold">
               <span className="text-nvs-brown">{formatCurrency(product.price)}</span>
-              <span className="text-slate-400 line-through">
-                {formatCurrency(product.originalPrice)}
-              </span>
+              {product.originalPrice > product.price ? (
+                <span className="text-slate-400 line-through">
+                  {formatCurrency(product.originalPrice)}
+                </span>
+              ) : null}
             </div>
           </div>
         </div>
       </Link>
-    </motion.article>
+    </Motion.article>
   )
 }
 

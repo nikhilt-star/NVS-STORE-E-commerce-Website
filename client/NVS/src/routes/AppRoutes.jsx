@@ -27,21 +27,21 @@ function AppRoutes() {
           <Route index element={<Home />} />
           <Route path="/products" element={<ProductList />} />
           <Route path="/products/:productId" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           <Route element={<PrivateRoute />}>
+            <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/profile" element={<Profile />} />
-          </Route>
 
-          <Route element={<AdminRoute />}>
-            <Route path="/admin" element={<Dashboard />} />
-            <Route path="/admin/products" element={<ManageProducts />} />
-            <Route path="/admin/orders" element={<ManageOrders />} />
-            <Route path="/admin/users" element={<ManageUsers />} />
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<Dashboard />} />
+              <Route path="/admin/products" element={<ManageProducts />} />
+              <Route path="/admin/orders" element={<ManageOrders />} />
+              <Route path="/admin/users" element={<ManageUsers />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -6,6 +6,7 @@ import Button from '../components/common/Button'
 import Input from '../components/common/Input'
 import { authService } from '../services/authService'
 import { useAuth } from '../hooks/useAuth'
+import { getApiErrorMessage } from '../utils/apiError'
 import { validators } from '../utils/validators'
 
 function Login() {
@@ -14,6 +15,8 @@ function Login() {
   const { login } = useAuth()
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
+  const [submitError, setSubmitError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -29,9 +32,17 @@ function Login() {
       return
     }
 
-    const payload = await authService.login(form)
-    login(payload)
-    navigate(location.state?.from?.pathname || '/profile', { replace: true })
+    try {
+      setIsSubmitting(true)
+      setSubmitError('')
+      const payload = await authService.login(form)
+      login(payload)
+      navigate(location.state?.from?.pathname || '/profile', { replace: true })
+    } catch (error) {
+      setSubmitError(getApiErrorMessage(error))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -59,10 +70,15 @@ function Login() {
                 setForm((current) => ({ ...current, password: event.target.value }))
               }
               error={errors.password}
-              placeholder="******"
+              placeholder="********"
             />
+            {submitError ? (
+              <p className="rounded-[20px] bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                {submitError}
+              </p>
+            ) : null}
             <Button type="submit" className="mt-2">
-              Log In
+              {isSubmitting ? 'Logging In...' : 'Log In'}
             </Button>
           </form>
 

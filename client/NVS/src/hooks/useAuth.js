@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, setCredentials } from '../features/auth/authSlice'
+import { authService } from '../services/authService'
+import { clearAuth, setAuthenticated } from '../features/auth/authSlice'
 
 export const useAuth = () => {
   const dispatch = useDispatch()
@@ -7,7 +8,14 @@ export const useAuth = () => {
 
   return {
     ...auth,
-    login: (payload) => dispatch(setCredentials(payload)),
-    logout: () => dispatch(logout()),
+    isAuthenticated: Boolean(auth.user),
+    login: (payload) => dispatch(setAuthenticated(payload.user)),
+    logout: async () => {
+      try {
+        await authService.logout()
+      } finally {
+        dispatch(clearAuth())
+      }
+    },
   }
 }
